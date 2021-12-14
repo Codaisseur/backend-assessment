@@ -1,21 +1,21 @@
-const express = require("express");
+const express = require('express');
 const { Router } = express;
 const router = new Router();
-const authMiddleware = require("../auth/authMiddleware");
+const authMiddleware = require('../auth/authMiddleware');
 
-const Player = require("../models").player;
+const Player = require('../models').player;
 
-const { Op } = require("sequelize");
+const { Op } = require('sequelize');
 
 // YELLOW REQUIREMENTS
 
-router.get("/", async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   const players = await Player.findAll();
   res.send(players);
 });
 
 // POST - CREATE NEW PLAYER
-router.post("/", async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
     const { name, age, nationality, teamId } = req.body;
 
@@ -23,53 +23,33 @@ router.post("/", async (req, res, next) => {
       res
         .status(400)
         .send(
-          "Missing parameters. Please provide the name, age, nationality, and teamId of the player."
+          'Missing parameters. Please provide the name, age, nationality, and teamId of the player.'
         );
     } else {
       const newPlayer = await Player.create({ name, age, nationality, teamId });
 
       if (!newPlayer) {
-        res.status(400).send("Something went wrong");
+        res.status(400).send('Something went wrong');
       } else {
         res.status(200).send(newPlayer);
       }
     }
   } catch (error) {
-    res.status(400).send("Something went wrong.");
+    res.status(400).send('Something went wrong.');
   }
 });
 
 // GREEN REQUIREMENTS
 
-// GET a specific player
-router.get("/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) {
-      res.status(400).send("Please provide a player ID");
-    } else {
-      const player = await Player.findByPk(id);
-
-      if (player) {
-        res.status(200).send(player);
-      } else {
-        res.status(404).send("No player found");
-      }
-    }
-  } catch (error) {
-    res.status(400).send("Something went wrong.");
-  }
-});
-
 // GET ALL PLAYERS ABOVE X AGE (EITHER DIRECTLY ON QUERY || FILTER AFTERWARDS)
 // HTTPie requests with query strings must be in quotes, i.e. ":4000/players/filter?age=30" in place of :4000/players/filter?age=30
-router.get("/filter", async (req, res, next) => {
+router.get('/filter', async (req, res, next) => {
   try {
     // Can be replaced with sending a body on the request instead of query but would be a POST instead
     const { age } = req.query;
+    console.log('the age', age);
     if (!age) {
-      res.status(400).send("Please provide the age parameter.");
+      res.status(400).send('Please provide the age parameter.');
     } else {
       // FILTER ON QUERY
       const filteredPlayers = await Player.findAll({
@@ -91,19 +71,40 @@ router.get("/filter", async (req, res, next) => {
   }
 });
 
+// GET a specific player
+router.get('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      res.status(400).send('Please provide a player ID');
+    } else {
+      const player = await Player.findByPk(id);
+
+      if (player) {
+        res.status(200).send(player);
+      } else {
+        res.status(404).send('No player found');
+      }
+    }
+  } catch (error) {
+    res.status(400).send('Something went wrong.');
+  }
+});
+
 // DELETE X PLAYER
-router.delete("/:id", authMiddleware, async (req, res, next) => {
+router.delete('/:id', authMiddleware, async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
-      res.status(400).send("Please provide a player ID");
+      res.status(400).send('Please provide a player ID');
     } else {
       const playerToBeDelete = await Player.findByPk(id);
       if (!playerToBeDelete) {
         res.status(404).send(`No player found with ID: ${id}`);
       } else {
         const deleted = playerToBeDelete.destroy();
-        res.status(200).send("Player deleted successfuly");
+        res.status(200).send('Player deleted successfuly');
       }
     }
   } catch (error) {

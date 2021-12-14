@@ -1,21 +1,21 @@
-const express = require("express");
+const express = require('express');
 const { Router } = express;
 const router = new Router();
 
-const Team = require("../models").team;
-const Player = require("../models").player;
+const Team = require('../models').team;
+const Player = require('../models').player;
 
 // YELLOW REQUIREMENTS
 
 // GET ALL TEAMS
-router.get("/", async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const teams = await Team.findAll();
 
     if (teams.length > 0) {
       res.status(200).send(teams);
     } else {
-      res.status(404).send("No teams found");
+      res.status(404).send('No teams found');
     }
   } catch (error) {
     next(error);
@@ -23,7 +23,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // GET ALL PLAYERS FROM A SPECIFIC TEAM => WITH RELATION FOR FULL POINTS
-router.get("/:teamId", async (req, res, next) => {
+router.get('/:teamId', async (req, res, next) => {
   try {
     const teamId = req.params.teamId;
 
@@ -32,7 +32,7 @@ router.get("/:teamId", async (req, res, next) => {
     if (team) {
       res.status(200).send(team);
     } else {
-      res.status(404).send("No team found");
+      res.status(404).send('No team found');
     }
   } catch (error) {
     next(error);
@@ -40,17 +40,17 @@ router.get("/:teamId", async (req, res, next) => {
 });
 
 // UPDATE NUMBER OF CHAMPIONSHIPS WON BY X TEAM
-router.put("/:teamId", async (req, res, next) => {
+router.put('/:teamId', async (req, res, next) => {
   try {
     const { teamId } = req.params;
     const { titles } = req.body;
 
     if (!titles) {
-      res.status(400).send("Please provide the number of titles won.");
+      res.status(400).send('Please provide the number of titles won.');
     } else {
       const teamToUpdate = await Team.findByPk(teamId);
       if (!teamToUpdate) {
-        res.status(404).send("Team not found.");
+        res.status(404).send('Team not found.');
       } else {
         const updatedTeam = await teamToUpdate.update({ titles });
         res.status(200).send(updatedTeam);
